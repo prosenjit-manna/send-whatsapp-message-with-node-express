@@ -60,12 +60,6 @@ app.post('/send-message', async (req, res) => {
 
     await client.sendMessage(group.id._serialized, message);
 
-      const { message } = req.body || {}; // Fallback to handle undefined req.body
-
-    if (!message) {
-        return res.status(400).json({ error: 'Missing message in request body.' });
-    }
-
     if (!hangoutsWebhookUrl) {
         return res.status(500).json({ error: 'Hangouts webhook URL is not configured.' });
     }
@@ -93,8 +87,6 @@ app.post('/send-message', async (req, res) => {
     res.status(500).json({ error: 'Failed to send message.' });
   }
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
