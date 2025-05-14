@@ -2,6 +2,7 @@ import express from 'express';
 import qrcode from 'qrcode-terminal';
 import whatsapp from 'whatsapp-web.js';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 const allowedGroups = process.env.ALLOWED_GROUPS ? process.env.ALLOWED_GROUPS.split(',') : [];
+const hangoutsWebhookUrl = process.env.HANGOUTS_WEBHOOK_URL;
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -57,12 +59,42 @@ app.post('/send-message', async (req, res) => {
     }
 
     await client.sendMessage(group.id._serialized, message);
+
+      const { message } = req.body || {}; // Fallback to handle undefined req.body
+
+    if (!message) {
+        return res.status(400).json({ error: 'Missing message in request body.' });
+    }
+
+    if (!hangoutsWebhookUrl) {
+        return res.status(500).json({ error: 'Hangouts webhook URL is not configured.' });
+    }
+
+    try {
+        const response = await fetch(hangoutsWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: message }),
+        });
+
+        if (!response.ok) {
+        throw new Error(`Failed to send message: ${response.statusText}`);
+        }
+
+        res.status(200).json({ status: 'Message sent successfully to Hangouts group.' });
+    } catch (error) {
+        console.error('Error sending message to Hangouts:', error);
+        res.status(500).json({ error: 'Failed to send message to Hangouts group.' });
+    }
+
     res.status(200).json({ status: 'Message sent successfully.' });
   } catch (error) {
     console.error('Error sending message:', error);
     res.status(500).json({ error: 'Failed to send message.' });
   }
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
