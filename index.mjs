@@ -31,6 +31,10 @@ client.on('ready', () => {
   console.log('WhatsApp client is ready!');
 });
 
+app.get('/', async (req, res) => {
+  res.send('WhatsApp Web.js server is running!');
+});
+
 app.post('/send-message', async (req, res) => {
   console.log('Request body:', req.body); // Debugging log
 
