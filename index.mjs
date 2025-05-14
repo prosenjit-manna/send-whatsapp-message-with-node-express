@@ -75,13 +75,20 @@ app.post('/send-message', async (req, res) => {
         throw new Error(`Failed to send message: ${response.statusText}`);
         }
 
-        res.status(200).json({ status: 'Message sent successfully to Hangouts group.' });
+        // Combine success response for both WhatsApp and Hangouts
+        res.status(200).json({
+          status: 'Message sent successfully.',
+          details: {
+            whatsapp: 'Message sent to WhatsApp group.',
+            hangouts: 'Message sent to Hangouts group.',
+          },
+        });
     } catch (error) {
         console.error('Error sending message to Hangouts:', error);
-        res.status(500).json({ error: 'Failed to send message to Hangouts group.' });
+        return res.status(500).json({
+          error: 'Message sent to WhatsApp group, but failed to send to Hangouts group.',
+        });
     }
-
-    res.status(200).json({ status: 'Message sent successfully.' });
   } catch (error) {
     console.error('Error sending message:', error);
     res.status(500).json({ error: 'Failed to send message.' });
