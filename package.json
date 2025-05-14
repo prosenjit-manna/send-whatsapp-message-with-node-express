@@ -1,0 +1,19 @@
+{
+  "name": "poc-whatsapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.28.0"
+  }
+}
